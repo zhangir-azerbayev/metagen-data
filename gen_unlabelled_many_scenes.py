@@ -15,9 +15,9 @@ from tdw.controller import Controller
 from tdw.tdw_utils import TDWUtils
 from tdw.librarian import ModelLibrarian
 from tdw.librarian import SceneLibrarian
-from tdw.output_data import OutputData, Bounds, Images, Collision, EnvironmentCollision, Environments
+from tdw.output_data import OutputData, Bounds, Images, Collision, EnvironmentCollision, SceneRegions
 
-num_videos = 100
+num_videos = 200
 num_frames = 20
 #place_dimensions = [7, 7]
 delta_too_close = 1 #3
@@ -104,6 +104,7 @@ objects = dict({'chair': ['chair_willisau_riale'],
 
 
 records = scene_lib.search_records("")
+#to_use = [2]
 to_use = [2, 34, 35, 36, 37] #box_room_2018, mm_kitchen_2a, mm_kitchen_2b, mm_kitchen_3a, mm_kitchen_3b
 #records = lib.search_records("box_room_2018")
 #url = [record for record in records][0].get_url()
@@ -131,19 +132,19 @@ for video in tqdm(range(num_videos)):
             "name": scene_name,
             "url": url})
 
-    resp = c.communicate({"$type": "send_environments"})
+    resp = c.communicate({"$type": "send_scene_regions"})
 
     for r in resp:
         r_id = OutputData.get_data_type_id(r)
-        if r_id == "envi":
-            env = Environments(r)
+        if r_id == "sreg":
+            scene_regions = SceneRegions(r)
             #print(env.get_center(0))
             #print(env.get_bounds(0))
-            room_dim_x = env.get_bounds(0)[0]#getting x and z, which are the floor
-            room_dim_z = env.get_bounds(0)[2]#getting x and z, which are the floor
+            room_dim_x = scene_regions.get_bounds(0)[0]#getting x and z, which are the floor
+            room_dim_z = scene_regions.get_bounds(0)[2]#getting x and z, which are the floor
             room_dimensions = [room_dim_x, room_dim_z]
             print(room_dimensions)
-            print(env.get_center(0))
+            print(scene_regions.get_center(0))
 
     print("created empty scene")
     # Populates scene with objects (placement is uniform random)
